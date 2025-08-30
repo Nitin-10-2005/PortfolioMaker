@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Portfolio Maker</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Lato&family=Montserrat&family=Open+Sans&family=Roboto&display=swap" rel="stylesheet">
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body>
+
+    <div class="app-container">
+        <!-- Sidebar for Controls -->
+        <div class="sidebar">
+            <div class="sidebar-tabs-container">
+                <div class="sidebar-tabs">
+                    <button id="tab-generate" class="sidebar-tab active">Generate</button>
+                    <button id="tab-edit" class="sidebar-tab" disabled>Edit</button>
+                    <button id="tab-customize" class="sidebar-tab" disabled>Customize</button>
+                </div>
+            </div>
+            <div class="sidebar-content">
+                <!-- AI Generation Panel -->
+                <div id="panel-generate" class="panel active">
+                    <h2>1. Generate Portfolio</h2>
+                    <p>Describe yourself in a few lines. The AI will do the rest!</p>
+                    <textarea id="ai-prompt-input" placeholder="e.g., My name is Ram, a Software Development Engineer..."></textarea>
+                    <button id="generate-portfolio-btn" class="btn">
+                        <span id="generate-btn-icon"></span>
+                        <span id="generate-btn-text">Generate Portfolio</span>
+                    </button>
+                    <p id="error-message" class="error-text"></p>
+                </div>
+                <!-- Editor Panel -->
+                <div id="panel-edit" class="panel">
+                    <!-- Dynamic editor content will be injected here by script.js -->
+                </div>
+                <!-- Customize Panel -->
+                <div id="panel-customize" class="panel">
+                    <h2>3. Customize</h2>
+                     <!-- Themes Section -->
+                    <div class="customize-section">
+                        <h3>Themes</h3>
+                        <div id="theme-selector" class="customize-grid"></div>
+                        <h4 class="ai-subheader">Generate with AI</h4>
+                        <textarea id="theme-prompt-input" placeholder="e.g., a calm ocean blue theme" rows="2"></textarea>
+                        <button id="generate-theme-btn" class="btn btn-pink">
+                             <span id="theme-btn-icon"></span>
+                             <span id="theme-btn-text">Create Theme</span>
+                        </button>
+                    </div>
+                     <!-- Typography Section -->
+                    <div class="customize-section">
+                        <h3>Typography</h3>
+                        <div id="font-selector" class="customize-grid"></div>
+                    </div>
+                     <!-- Format Section -->
+                    <div class="customize-section">
+                        <h3>Format</h3>
+                        <div id="layout-selector" class="customize-grid"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content for Preview -->
+        <div class="main-content">
+            <div class="preview-actions">
+                <button id="share-btn" class="preview-action-btn" title="Copy Shareable Link"></button>
+                <button id="download-pdf-btn" class="preview-action-btn" title="Download as PDF"></button>
+            </div>
+            <div id="portfolio-preview-container">
+                <div id="portfolio-content" class="portfolio-content">
+                    <!-- Portfolio preview will be rendered here by script.js -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- External Libraries -->
+    <!-- Note: Lucide is no longer needed -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
+
