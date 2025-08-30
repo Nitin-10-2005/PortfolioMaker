@@ -2,6 +2,7 @@
 
 const express = require('express');
 const fetch = require('node-fetch');
+const path = require('path'); // Added for resolving file paths
 require('dotenv').config();
 
 const app = express();
@@ -10,6 +11,13 @@ const PORT = process.env.PORT || 3000;
 // Middleware to parse JSON bodies and serve static files from the 'public' directory
 app.use(express.json());
 app.use(express.static('public'));
+
+// --- FIX STARTS HERE ---
+// Add a route handler for the root URL ('/') to serve the index.html file.
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+// --- FIX ENDS HERE ---
 
 // Secure endpoint to handle AI portfolio generation
 app.post('/generate-portfolio', async (req, res) => {
@@ -23,7 +31,7 @@ app.post('/generate-portfolio', async (req, res) => {
         return res.status(400).json({ error: "Prompt and schema are required." });
     }
 
-    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${apiKey}`;
     const payload = {
         contents: [{ parts: [{ text: prompt }] }],
         generationConfig: {
@@ -66,7 +74,7 @@ app.post('/generate-theme', async (req, res) => {
         return res.status(400).json({ error: "Prompt and schema are required." });
     }
     
-    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${apiKey}`;
     const payload = {
         contents: [{ parts: [{ text: prompt }] }],
         generationConfig: {
@@ -101,3 +109,4 @@ app.post('/generate-theme', async (req, res) => {
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
 });
+
