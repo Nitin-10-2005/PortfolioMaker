@@ -1,62 +1,103 @@
+// A simple Node.js server using Express to handle API requests and serve static files.
+
 const express = require('express');
-const path = require('path');
-const { GoogleGenerativeAI } = require('@google/generative-ai');
+const fetch = require('node-fetch');
+require('dotenv').config();
 
 const app = express();
-const port = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3000;
 
-// Middleware to parse JSON bodies
+// Middleware to parse JSON bodies and serve static files from the 'public' directory
 app.use(express.json());
+app.use(express.static('public'));
 
-// Serve static files from the 'public' directory
-app.use(express.static(path.join(__dirname, 'public')));
-
-// --- FIX STARTS HERE ---
-// Explicitly serve index.html for the root route
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'index.html'));
-});
-// --- FIX ENDS HERE ---
-
-// Initialize the Google Generative AI client
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-
-// Generic AI generation endpoint
-async function handleAIGeneration(req, res, modelName) {
+// Secure endpoint to handle AI portfolio generation
+app.post('/generate-portfolio', async (req, res) => {
     const { prompt, schema } = req.body;
-    if (!prompt || !schema) {
-        return res.status(400).json({ error: 'Prompt and schema are required.' });
+    const apiKey = process.env.GEMINI_API_KEY;
+
+    if (!apiKey) {
+        return res.status(500).json({ error: "API key not configured on the server." });
     }
+    if (!prompt || !schema) {
+        return res.status(400).json({ error: "Prompt and schema are required." });
+    }
+
+    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+    const payload = {
+        contents: [{ parts: [{ text: prompt }] }],
+        generationConfig: {
+            responseMimeType: "application/json",
+            responseSchema: schema
+        }
+    };
 
     try {
-        const model = genAI.getGenerativeModel({
-            model: modelName,
-            generationConfig: {
-                responseMimeType: "application/json",
-                responseSchema: schema
-            }
+        const apiResponse = await fetch(apiUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
         });
 
-        const result = await model.generateContent(prompt);
-        const response = result.response;
-        res.json(JSON.parse(response.text()));
+        if (!apiResponse.ok) {
+            const errorBody = await apiResponse.json();
+            console.error('API Error:', errorBody);
+            throw new Error(`API request failed: ${errorBody.error.message}`);
+        }
+
+        const result = await apiResponse.json();
+        res.json(result);
+
     } catch (error) {
-        console.error('AI generation error:', error);
-        res.status(500).json({ error: 'Failed to generate content from AI.', details: error.message });
+        console.error('Server Error:', error);
+        res.status(500).json({ error: error.message });
     }
-}
-
-// API endpoint for generating portfolio content
-app.post('/generate-portfolio', (req, res) => {
-    handleAIGeneration(req, res, 'gemini-1.5-flash-latest');
 });
 
-// API endpoint for generating themes
-app.post('/generate-theme', (req, res) => {
-    handleAIGeneration(req, res, 'gemini-1.5-flash-latest');
+// Secure endpoint to handle AI theme generation
+app.post('/generate-theme', async (req, res) => {
+    const { prompt, schema } = req.body;
+    const apiKey = process.env.GEMINI_API_KEY;
+
+     if (!apiKey) {
+        return res.status(500).json({ error: "API key not configured on the server." });
+    }
+    if (!prompt || !schema) {
+        return res.status(400).json({ error: "Prompt and schema are required." });
+    }
+    
+    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+    const payload = {
+        contents: [{ parts: [{ text: prompt }] }],
+        generationConfig: {
+            responseMimeType: "application/json",
+            responseSchema: schema
+        }
+    };
+
+    try {
+        const apiResponse = await fetch(apiUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+
+        if (!apiResponse.ok) {
+            const errorBody = await apiResponse.json();
+             console.error('API Error:', errorBody);
+            throw new Error(`API request failed: ${errorBody.error.message}`);
+        }
+        
+        const result = await apiResponse.json();
+        res.json(result);
+
+    } catch (error) {
+        console.error('Server Error:', error);
+        res.status(500).json({ error: error.message });
+    }
 });
 
-app.listen(port, () => {
-    console.log(`Server is running on http://localhost:${port}`);
-});
 
+app.listen(PORT, () => {
+    console.log(`Server is running on http://localhost:${PORT}`);
+});
